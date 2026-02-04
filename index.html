@@ -3,52 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dutchie Vault Master Restock</title>
+    <title>GanjaFlow | Dutchie Restock Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white; p: 0; }
-            .shadow-2xl { shadow: none; border: none; }
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #061e14; }
+        .leaf-bg { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%230a2f1f' d='M50 10c-1.1 5.5-2 11-2 16.5 0 13.8 11.2 25 25 25 5.5 0 11-.9 16.5-2-5.5 1.1-11 2-16.5 2-13.8 0-25-11.2-25-25 0-5.5.9-11 2-16.5zm-2 16.5c0-5.5.9-11 2-16.5-1.1 5.5-2 11-2 16.5 0 13.8 11.2 25 25 25 5.5 0 11-.9 16.5-2-5.5 1.1-11 2-16.5 2-13.8 0-25-11.2-25-25z'/%3E%3C/svg%3E"); }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
     </style>
 </head>
-<body class="bg-slate-50 p-4 md:p-8 text-slate-900 font-sans">
-    <div class="max-w-6xl mx-auto bg-white p-6 md:p-10 rounded-3xl shadow-2xl border border-slate-200">
+<body class="leaf-bg min-h-screen p-4 md:p-8 text-emerald-50">
+    <div class="max-w-6xl mx-auto">
         
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6 border-b pb-8">
-            <div>
-                <h1 class="text-4xl font-black tracking-tight text-indigo-950 italic">Vault → Floor</h1>
-                <p class="text-slate-500 font-medium italic">Smart pull-quantities with Fridge & Bin logic.</p>
-            </div>
-            
-            <div class="no-print flex flex-wrap gap-4 bg-slate-100 p-4 rounded-2xl border border-slate-200">
-                <div class="flex items-center gap-4 border-r pr-4 border-slate-300">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="oosToggle" onchange="generateReport()" class="w-4 h-4 text-indigo-600 rounded">
-                        <span class="text-[10px] font-black uppercase text-red-500">Out of Stock Only</span>
-                    </label>
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+            <div class="flex items-center gap-4">
+                <div class="bg-emerald-500 p-3 rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.4)]">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C12 22 12 18 13 15C14 12 17 11 17 11C17 11 14 10 13 7C12 4 12 0 12 0C12 0 12 4 11 7C10 10 7 11 7 11C7 11 10 12 11 15C12 18 12 22 12 22Z" fill="white"/></svg>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Restock Trigger</label>
-                    <input type="number" id="thresholdInput" value="5" class="w-16 p-2 rounded-lg border border-slate-300 font-bold text-center outline-none focus:ring-2 focus:ring-indigo-500" oninput="generateReport()">
+                    <h1 class="text-4xl font-black uppercase tracking-tighter text-white">GanjaFlow</h1>
+                    <p class="text-emerald-400 font-bold text-xs uppercase tracking-[0.2em]">Dutchie Restock Dashboard</p>
                 </div>
-                <button onclick="window.print()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl hover:bg-indigo-700 font-bold self-end shadow-lg transition-all active:scale-95">Print List</button>
             </div>
-        </div>
+            
+            <div class="glass p-4 rounded-3xl flex flex-wrap gap-4 items-center">
+                <label class="flex items-center gap-2 cursor-pointer group">
+                    <input type="checkbox" id="oosToggle" onchange="generateReport()" class="w-5 h-5 rounded border-emerald-500 text-emerald-500 bg-transparent focus:ring-emerald-500">
+                    <span class="text-[10px] font-black uppercase text-emerald-300 group-hover:text-white">Empty Slots Only</span>
+                </label>
+                <div class="h-8 w-[1px] bg-emerald-800"></div>
+                <div>
+                    <label class="block text-[8px] font-black uppercase text-emerald-500 mb-1">Low Stock Trigger</label>
+                    <input type="number" id="thresholdInput" value="5" class="bg-emerald-950 border border-emerald-800 text-white rounded-lg px-3 py-1 w-16 font-bold text-center focus:border-emerald-400 outline-none" oninput="generateReport()">
+                </div>
+            </div>
+        </header>
 
-        <div id="dropZone" class="no-print border-2 border-dashed border-indigo-200 p-10 rounded-2xl text-center mb-8 hover:border-indigo-500 transition-colors bg-indigo-50/30 group cursor-pointer">
+        <div id="dropZone" class="glass group p-12 rounded-[40px] text-center mb-10 border-2 border-dashed border-emerald-800 hover:border-emerald-400 transition-all cursor-pointer">
             <input type="file" id="csvFile" accept=".csv" class="hidden" onchange="handleFileSelect(this)" />
             <label for="csvFile" class="cursor-pointer block">
-                <span class="text-indigo-600 font-bold text-xl group-hover:underline uppercase tracking-tight text-center">Step 1: Upload Dutchie Inventory CSV</span>
-                <p class="text-sm text-slate-400 mt-2 italic text-center">Export must include Product, Brand, Room, and Available.</p>
+                <div class="inline-block bg-emerald-500/10 p-4 rounded-full mb-4 group-hover:scale-110 transition-transform">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <h2 class="text-2xl font-black text-white">Upload Inventory CSV</h2>
+                <p class="text-emerald-600 mt-2 font-medium">Automatic Brand, Room, and Batch Detection</p>
             </label>
         </div>
 
-        <div id="brandManager" class="hidden no-print mb-10 p-6 bg-slate-50 rounded-2xl border border-slate-200">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">Step 2: Set Bin/Fridge Capacities</h2>
-                <button onclick="clearLimits()" class="text-[10px] font-bold text-red-400 uppercase border border-red-200 px-2 py-1 rounded">Clear All Memory</button>
+        <div id="debugLog" class="hidden mb-6 p-4 bg-red-900/40 border border-red-500/50 rounded-2xl text-red-200 text-xs font-mono"></div>
+
+        <section id="brandManager" class="hidden mb-12 animate-in fade-in duration-700">
+            <div class="flex justify-between items-end mb-6">
+                <h3 class="text-xs font-black uppercase tracking-[0.3em] text-emerald-500">2. Configure Shelf Space</h3>
+                <button onclick="clearLimits()" class="text-[10px] font-black text-emerald-700 hover:text-red-400 uppercase tracking-widest transition-colors">Wipe Memory</button>
             </div>
-            <div id="brandInputGrid" class="grid grid-cols-1
+            <div id="brandInputGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        </section>
+
+        <section id="summarySection" class="hidden mb-12">
+            <h3 class="text-xs font-black uppercase tracking-[0.3em] text-emerald-500 mb-6 text-center">3. Vault Master Totals</h3>
+            <div id="brandSummaryList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+        </section>
+
+        <section id="results" class="hidden">
+            <h3 class="text-xs font-black uppercase tracking-[0.3em] text-emerald-500 mb-6">4. Individual Pull Breakdown</h3>
+            <div class="glass rounded-[32px] overflow-hidden border border-emerald-900 shadow-2xl">
+                <table class="w-full text-left">
+                    <thead class="bg-emerald-950 text-emerald-500 text-[10px] font-black uppercase tracking-widest">
+                        <tr>
+                            <th class="p-6">Product Information</th>
+                            <th class="p-6 text-center">Current Stock</th>
+                            <th class="p-6 text-center">Storage</th>
+                            <th class="p-6 text-center bg-emerald-500/10 text-emerald-400">Restock Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-emerald-900/50 text-emerald-100"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        let globalData = [];
+        let colMap = {};
+        let savedLimits = JSON.parse(localStorage.getItem('ganjaFlowLimits')) || {};
+
+        function handleFileSelect(input) {
+            if (!input.files[0]) return;
+            Papa.parse(input.files[0], {
+                header: true, skipEmptyLines: true,
+                complete: function(results) {
+                    const headers = results.meta.fields;
+                    const log = document.getElementById('debugLog');
+                    log.classList.add('hidden');
+
+                    colMap = {
+                        product: headers.find(h => h.toLowerCase().includes('product')),
+                        brand: headers.find(h => h.toLowerCase().includes('brand') || h.toLowerCase().includes('manufacturer')),
+                        room: headers.find(h => h.toLowerCase().includes('room')),
+                        qty: headers.find(h => h.toLowerCase().includes('available') || h.toLowerCase().includes('quantity'))
+                    };
+
+                    let missing = Object.keys(colMap).filter(k => !colMap[k]);
+                    if (missing.length > 0) {
+                        log.classList.remove('hidden');
+                        log.innerHTML = `<strong>Error:</strong> Failed to map: ${missing.join(', ')}<br>Headers found: ${headers.join(', ')}`;
+                        return;
+                    }
+
+                    globalData = results.data;
+                    setupBrandManager(results.data);
+                    generateReport();
+                }
+            });
+        }
+
+        function setupBrandManager(data) {
+            const brands = new Set();
+            data.forEach(row => { if (row[colMap.brand]) brands.add(row[colMap.brand]); });
+
+            const grid = document.getElementById('brandInputGrid');
+            grid.innerHTML = '';
+            Array.from(brands).sort().forEach(brand => {
+                const config = savedLimits[brand] || { cap: 0, type: 'Full Bin' };
+                grid.innerHTML += `
+                    <div class="glass p-4 rounded-2xl border border-emerald-900 hover:border-emerald-500 transition-colors">
+                        <label class="text-[9px] font-black text-emerald-600 uppercase truncate block mb-2">${brand}</label>
+                        <div class="flex gap-2">
+                            <input type="number" value="${config.cap}" oninput="updateLimit('${brand}', this.value, null)" placeholder="0"
+                                class="w-1/3 bg-emerald-950 border border-emerald-800 text-emerald-100 p-1 text-xs rounded-lg text-center outline-none focus:border-emerald-500">
+                            <select onchange="updateLimit('${brand}', null, this.value)"
+                                class="w-2/3 bg-emerald-950 border border-emerald-800 text-emerald-400 p-1 text-[10px] rounded-lg outline-none font-bold">
+                                <option value="Full Bin" ${config.type === 'Full Bin' ? 'selected' : ''}>Full Bin</option>
+                                <option value="Half Bin" ${config.type === 'Half Bin' ? 'selected' : ''}>Half Bin</option>
+                                <option value="Double Bin" ${config.type === 'Double Bin' ? 'selected' : ''}>Double Bin</option>
+                                <option value="Fridge" ${config.type === 'Fridge' ? 'selected' : ''}>❄️ Fridge</option>
+                            </select>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('brandManager').classList.remove('hidden');
+        }
+
+        function updateLimit(brand, cap, type) {
+            if (!savedLimits[brand]) savedLimits[brand] = { cap: 0, type: 'Full Bin' };
+            if (cap !== null) savedLimits[brand].cap = parseInt(cap) || 0;
+            if (type !== null) savedLimits[brand].type = type;
+            localStorage.setItem('ganjaFlowLimits', JSON.stringify(savedLimits));
+            generateReport();
+        }
+
+        function clearLimits() {
+            if (confirm("Reset shelf configurations?")) {
+                savedLimits = {};
+                localStorage.removeItem('ganjaFlowLimits');
+                setupBrandManager(globalData);
+                generateReport();
+            }
+        }
+
+        function generateReport() {
+            const products = {};
+            const brandTotals = {};
+            const threshold = parseInt(document.getElementById('thresholdInput').value) || 0;
+            const oosOnly = document.getElementById('oosToggle').checked;
+
+            globalData.forEach(row => {
+                const name = row[colMap.product], brand = row[colMap.brand] || "Unknown", room = (row[colMap.room] || "").toLowerCase(), qty = parseFloat(row[colMap.qty]) || 0;
+                if (!name) return;
+                const key = `${name}-${brand}`;
+                if (!products[key]) products[key] = { name, brand, floor: 0, vault: 0 };
+                if (room.includes('floor')) products[key].floor += qty;
+                if (room.includes('vault')) products[key].vault += qty;
+            });
+
+            const tableBody = document.getElementById('tableBody');
+            const summaryList = document.getElementById('brandSummaryList');
+            tableBody.innerHTML = '';
+            summaryList.innerHTML = '';
+
+            Object.values(products).forEach(p => {
+                const config = savedLimits[p.brand] || { cap: 0, type: 'Full Bin' };
+                let show = (config.cap > 0 && p.vault > 0);
+                show = oosOnly ? (show && p.floor === 0) : (show && p.floor <= threshold);
+
+                if (show) {
+                    const pull = Math.max(0, Math.min(config.cap - p.floor, p.vault));
+                    if (pull > 0) {
+                        const isFridge = config.type === 'Fridge';
+                        tableBody.innerHTML += `
+                            <tr class="hover:bg-white/5 transition-colors">
+                                <td class="p-6">
+                                    <div class="font-bold text-white mb-1">${p.name}</div>
+                                    <span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-black uppercase border border-emerald-500/20">${p.brand}</span>
+                                </td>
+                                <td class="p-6 text-center font-bold">
+                                    <span class="${p.floor === 0 ? 'text-red-500' : 'text-orange-400'}">${p.floor}</span>
+                                    <span class="text-emerald-900 mx-1">/</span>
+                                    <span class="text-emerald-400">${p.vault}</span>
+                                </td>
+                                <td class="p-6 text-center">
+                                    <span class="text-[9px] font-black uppercase px-2 py-1 rounded-full ${isFridge ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-emerald-950 text-emerald-600'}">
+                                        ${config.type}
+                                    </span>
+                                </td>
+                                <td class="p-6 text-center bg-emerald-500/5">
+                                    <span class="bg-emerald-500 text-emerald-950 font-black px-4 py-2 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)]">${pull}</span>
+                                </td>
+                            </tr>`;
+                        brandTotals[p.brand] = (brandTotals[p.brand] || 0) + pull;
+                    }
+                }
+            });
+
+            Object.entries(brandTotals).sort((a,b)=>b[1]-a[1]).forEach(([brand, total]) => {
+                const isFridge = savedLimits[brand]?.type === 'Fridge';
+                summaryList.innerHTML += `
+                    <div class="${isFridge ? 'bg-cyan-600 text-cyan-50' : 'bg-emerald-600 text-emerald-50'} p-5 rounded-3xl shadow-lg flex flex-col items-center border border-white/10">
+                        <span class="text-[9px] font-black uppercase tracking-widest opacity-80 mb-2">${isFridge ? '❄️ ' : ''}${brand}</span>
+                        <span class="text-3xl font-black">${total}</span>
+                    </div>`;
+            });
+
+            document.getElementById('results').classList.toggle('hidden', tableBody.innerHTML === '');
+            document.getElementById('summarySection').classList.toggle('hidden', summaryList.innerHTML === '');
+        }
+    </script>
+</body>
+</html>
